@@ -41,6 +41,14 @@ Examples:
 - `2.6.35.0` becomes `2.6.35`
 - `2.6.35` becomes `2.6.35`
 
+### Client cookie
+
+HoN client uses a 32 byte cookie that is passed around. In case you need it you can get it from the HoN client. It looks like `12345678a2b4c6d8e2f4162832445668`.
+
+This is not a valid cookie.
+
+Currently you can manually set it in `main.py` `main()` function, when calling `_client.patcher()`.
+
 ## HoN client information
 
 HoN client is avaliable for the following platforms:
