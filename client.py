@@ -125,7 +125,7 @@ class HonClient:
 
         return response_data
 
-    def get_manifest(self, base_url, version, filename):
+    def get_manifest(self, base_url, version, filename, previous):
         endpoint = '/{os}/{arch}/{version}/{filename}'.format(
             os=self.os,
             arch=self.arch,
@@ -143,7 +143,7 @@ class HonClient:
                 endpoint=endpoint
             ))
 
-        return ManifestParser(os=self.os, arch=self.arch).extract(
+        return ManifestParser(os=self.os, arch=self.arch, previous=previous).extract(
             response=response,
             manifest_filename=filename,
             version=version,
