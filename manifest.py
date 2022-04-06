@@ -3,15 +3,17 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 from progress.bar import Bar
+from packaging import version as v
 
 from utils import FileUtil, Semver
 
 
 class ManifestParser:
-    def __init__(self, os, arch):
+    def __init__(self, os, arch, previous):
         self.os = os
         self.arch = arch
         self.data_dir = 'data'
+        self.previous = previous
 
     def extract(self, response, manifest_filename, version):
         # ensure data dir exists
@@ -40,6 +42,12 @@ class ManifestParser:
             _childpath = child.attrib['path']
             path = f'{_childpath}.zip'
             version = child.attrib['version']
+
+            if self.previous:
+              if v.parse(version) <= v.parse(self.previous):
+                self.bar.next()
+                return
+
             # zipsize = child.attrib['zipsize']
             # size = child.attrib['size']
             # checksum = child.attrib['checksum']
