@@ -1,3 +1,4 @@
+import multiprocessing
 from argparse import ArgumentParser
 
 from client import HonClient
@@ -5,17 +6,18 @@ from manifest import ManifestParser
 
 
 class HonParser:
-    def __init__(self, args):
-        # example 2.6.10, 4.10.
-        self.version = args.semver
+    def __init__(self, os, arch):
         # example wac / mac / linux
-        self.os = args.os
+        self.os = os
         # example i686
-        self.arch = args.arch
+        self.arch = arch
         # self.poolsize = int(args.poolsize)
         self.base_url = 'http://masterserver.naeu.heroesofnewerth.com/'
 
-    def main(self):
+    def main(self, version):
+        # example 2.6.10, 4.10.
+        self.version = version
+
         _client = HonClient(
             base_url=self.base_url,
             os=self.os,
@@ -53,7 +55,6 @@ parser.add_argument(
     dest='semver',
     help='download hon client version SEMVER',
     metavar='SEMVER',
-    required=True,
 )
 
 parser.add_argument(
@@ -73,7 +74,36 @@ parser.add_argument(
     metavar='ARCH',
     required=True,
 )
+parser.add_argument(
+    '-l',
+    '--version-list',
+    dest='version_list',
+    help='list of version to download',
+    metavar='VERSION_LIST',
+)
 
 _args = parser.parse_args()
 
-HonParser(_args).main()
+# manual logic for version/version_list arguments
+if _args.version_list is None:
+    if _args.semver is None:
+        raise Exception('"semver" variable is required')
+
+    HonParser(
+        os=_args.os,
+        arch=_args.arch,
+    ).main(
+        version=_args.semver
+    )
+else:
+    versions = _args.version_list.split(',')
+    poolsize = len(versions) if len(versions) < 8 else 8
+    pool = multiprocessing.Pool(poolsize)
+    # defaults to windows and i686
+    results = pool.map(
+        HonParser(
+            os=_args.os,
+            arch=_args.arch
+        ).main,
+        versions
+    )

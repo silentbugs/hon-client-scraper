@@ -154,6 +154,12 @@ class HonClient:
         )
 
         if not response.ok:
-            raise FileNotFoundError('Cannot fetch: {file}'.format(file=path))
+            raise FileNotFoundError(
+                'Cannot fetch: ({version}/{client_version}) - {file}'.format(
+                    file=path,
+                    client_version=version,
+                    version=self.version,
+                )
+            )
 
         return response
