@@ -37,7 +37,8 @@ class ManifestParser:
 
     def parse_child(self, child):
         if child.tag == 'file':
-            path = '{_path}.zip'.format(_path=child.attrib['path'])
+            _childpath = child.attrib['path']
+            path = f'{_childpath}.zip'
             version = child.attrib['version']
             # zipsize = child.attrib['zipsize']
             # size = child.attrib['size']
@@ -108,7 +109,7 @@ class ManifestParser:
 
             total_items = len(root)
 
-            bar_messsage = 'Downloading HoN client {v}'.format(v=self._version)
+            bar_messsage = f'Downloading HoN client {self._version}'
             self.bar = Bar(bar_messsage, max=total_items)
             for child in root:
                 self.parse_child(child)

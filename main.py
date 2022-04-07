@@ -44,7 +44,7 @@ class HonParser:
             base_url='http://dl.heroesofnewerth.com/',
         )
 
-        print('\nDone, version: {version}'.format(version=self.version))
+        print(f'\nDone, version: {self.version}')
 
 parser = ArgumentParser(description='Hon Client downloader')
 parser.add_argument(
