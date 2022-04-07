@@ -3,7 +3,7 @@ import requests
 from urllib.parse import urljoin
 
 from manifest import ManifestParser
-from utils import SemverUtil
+from utils import Semver
 
 
 class BaseRequest:
@@ -83,7 +83,7 @@ class HonClient:
         user_agent = 'S2 Games/Heroes of Newerth/{version}/{os}/{arch}'.format(
             os=os,
             arch=arch,
-            version=SemverUtil(version).four(),
+            version=Semver(version).four(),
         )
 
         self.headers = {
@@ -144,7 +144,7 @@ class HonClient:
         endpoint = '{os}/{arch}/{version}/{path}'.format(
             os=os,
             arch=arch,
-            version=SemverUtil(version).pretty(),
+            version=Semver(version).pretty(),
             path=path,
         )
 

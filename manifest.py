@@ -4,7 +4,7 @@ import zipfile
 
 from progress.bar import Bar
 
-from utils import FileUtil, SemverUtil
+from utils import FileUtil, Semver
 
 
 class ManifestParser:
@@ -50,7 +50,7 @@ class ManifestParser:
                     self.data_dir,
                     self.os,
                     self.arch,
-                    SemverUtil(self._version).pretty(),
+                    Semver(self._version).pretty(),
                     os.path.dirname(path),
                 )
                 file_name = FileUtil.path_leaf(path)
