@@ -79,6 +79,7 @@ class HonClient:
         self.os = os
         self.arch = arch
         self.version = version
+        self.session = requests.Session()
 
         user_agent = 'S2 Games/Heroes of Newerth/{version}/{os}/{arch}'.format(
             os=os,
@@ -148,7 +149,7 @@ class HonClient:
             path=path,
         )
 
-        response = requests.get(
+        response = self.session.get(
             urljoin(self.base_url, endpoint),
             headers=self.headers
         )
