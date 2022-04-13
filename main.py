@@ -31,9 +31,10 @@ class HonParser:
         if not patcher_data.ok():
             raise Exception('Unable to get patcher data.')
 
+        base_url = 'https://cdn.naeu.patch.heroesofnewerth.com/' if self.arch == 'x86_64' else 'http://dl.heroesofnewerth.com/'
         manifest_filename = 'manifest.xml.zip'
         manifest_response = _client.get_manifest(
-            base_url='http://dl.heroesofnewerth.com/',  # must get from patcher_data response
+            base_url=base_url,  # must get from patcher_data response
             version=self.version,  # must get from patcher_data response
             filename=manifest_filename,
         )
@@ -41,7 +42,7 @@ class HonParser:
         ManifestParser(os=self.os, arch=self.arch).parse(
             client=_client,
             manifest_file=manifest_response,
-            base_url='http://dl.heroesofnewerth.com/',
+            base_url=base_url,
         )
 
         print(f'\nDone, version: {self.version}')
