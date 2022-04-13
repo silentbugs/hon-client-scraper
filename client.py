@@ -116,7 +116,7 @@ class HonClient:
         self.headers['Content-Length'] = '{l}'.format(l=len(serialized_data))
         self.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 
-        response = requests.post(
+        response = self.session.post(
             urljoin(self.base_url, endpoint),
             headers=self.headers,
             data=request_data.serialize()
@@ -133,7 +133,7 @@ class HonClient:
             filename=filename,
         )
 
-        response = requests.get(
+        response = self.session.get(
             urljoin(base_url, endpoint),
             headers=self.headers
         )
