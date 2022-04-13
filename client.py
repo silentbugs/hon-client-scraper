@@ -1,4 +1,6 @@
 import requests
+from tokenize import tokenize, NUMBER, STRING, OP, NAME
+from io import BytesIO
 
 from urllib.parse import urljoin
 
@@ -25,32 +27,6 @@ class BaseRequest:
 
 class BaseResponse:
     def deserialize(self, data):
-        # need to custom deserialize/tokenize the data of type:
-        #
-        #
-        # a:2:{
-        #     i:0;:8: {
-        #         s:7:"version";s:6:"4.10.1";
-        #         s:2:"os";s:3:"wac";
-        #         s:4:"arch";s:4:"i686";
-        #         s:3:"url";s:30:"http://dl.heroesofnewerth.com/";
-        #         s:4:"url2";s:33:"http://patch.heroesofnewerth.com/";
-        #         s:14:"latest_version";s:6:"4.10.1";
-        #         s:24:"latest_manifest_checksum";s:40:"e8e54bf5cd5dbe486b7f9c3166dd1366d3db38d8";
-        #         s:20:"latest_manifest_size";s:7:"6154107";
-        #     }
-        #     s:7:"version";:8:"4.10.1.0";
-        # }
-        #
-        # a:2 = array of 2 items
-        # i:0 ???
-        # :8 probably means 8 elements
-        #
-        # s:7:"version";s:6:"4.10.1";
-        # which means:
-        # type: string
-        # length: 7
-        # value: "version"
         return data
 
 
@@ -65,12 +41,44 @@ class PatcherRequest(BaseRequest):
 class PatcherResponse(BaseResponse):
     def __init__(self, response):
         self.response = response
+        self.tokens = self.tokenize()
+
+    def tokenize(self):
+        # parse patcher data
+        patcher_tokens = tokenize(
+            BytesIO(self.response.content).readline
+        )
+
+        # convert tokens to json
+        values = list()
+        local_values = list()
+        indentation = 0
+
+        for toknum, tokval, _, _, _ in patcher_tokens:
+            if toknum == OP:
+                if tokval == '}':
+                    values.append(
+                        dict(zip(
+                            # even items
+                            local_values[::2],
+                            # odd items
+                            local_values[1::2]
+                        ))
+                    )
+                    local_values = []
+
+            if toknum == NAME and tokval == 'N':
+                # null value
+                local_values.append(None)
+
+            if toknum == STRING:
+                local_values.append(tokval.strip('"'))
+
+        return values
 
     def ok(self):
         # bad way of checking if a response is ok
-        return 'a:1:{s:7:"version";N;}' not in self.deserialize(
-            self.response.text
-        )
+        return self.tokens[-1]['version'] is not None
 
 
 class HonClient:
