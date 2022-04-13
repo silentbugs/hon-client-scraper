@@ -15,6 +15,19 @@ class HonParser:
         # self.poolsize = int(args.poolsize)
         self.base_url = 'http://masterserver.naeu.heroesofnewerth.com/'
 
+    def get_client_url(self, arch):
+        default = 'http://dl.heroesofnewerth.com/'
+
+        urls = {
+            'i686': default,
+            'x86_64': 'https://cdn.naeu.patch.heroesofnewerth.com/'
+        }
+
+        if arch in urls.keys():
+            return urls[arch]
+
+        return default
+
     def main(self):
         _client = HonClient(
             base_url=self.base_url,
@@ -28,13 +41,15 @@ class HonParser:
             cookie=''  # 32 bytes
         )
 
+
         if not patcher_data.ok():
             raise Exception('Unable to get patcher data.')
 
-        base_url = 'https://cdn.naeu.patch.heroesofnewerth.com/' if self.arch == 'x86_64' else 'http://dl.heroesofnewerth.com/'
+        client_url = self.get_client_url(self.arch)
+
         manifest_filename = 'manifest.xml.zip'
         manifest_response = _client.get_manifest(
-            base_url=base_url,  # must get from patcher_data response
+            base_url=client_url,  # must get from patcher_data response
             version=self.version,  # must get from patcher_data response
             filename=manifest_filename,
         )
@@ -42,7 +57,7 @@ class HonParser:
         ManifestParser(os=self.os, arch=self.arch).parse(
             client=_client,
             manifest_file=manifest_response,
-            base_url=base_url,
+            base_url=client_url,
         )
 
         print(f'\nDone, version: {self.version}')
